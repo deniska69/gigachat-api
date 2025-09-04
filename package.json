@@ -1,0 +1,23 @@
+{
+  "name": "alice-gpt",
+  "version": "1.0.0",
+  "repository": "https://github.com/deniska69/alice-gpt",
+  "author": "deniska69 <gostev.dy@yandex.ru>",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "npx tsc && node dist/index.js"
+  },
+  "dependencies": {
+    "@parabit/prettier": "^0.0.5",
+    "dotenv": "^17.2.2",
+    "gigachat": "^0.0.16",
+    "prettier": "^3.6.2",
+    "typescript": "^5.9.2"
+  },
+  "devDependencies": {
+    "@types/body-parser": "^1.19.6",
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.3.1"
+  }
+}
