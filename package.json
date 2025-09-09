@@ -13,7 +13,8 @@
     "dotenv": "^17.2.2",
     "gigachat": "^0.0.16",
     "prettier": "^3.6.2",
-    "typescript": "^5.9.2"
+    "typescript": "^5.9.2",
+    "udsv": "^0.7.3"
   },
   "devDependencies": {
     "@types/body-parser": "^1.19.6",

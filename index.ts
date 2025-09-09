@@ -1,45 +1,32 @@
-import dotenv from 'dotenv';
-import GigaChat from 'gigachat';
-import { Agent } from 'node:https';
-
-console.clear();
-console.log(' ---------- [START] ---------- ');
-
-dotenv.config();
-
-const AUTH_TOKEN = process.env.GIGA_AUTH_KEY;
+import GPT from './gpt.js';
+import { readFile } from './helpers.js';
 
 const CONTENT =
-	'У меня есть категория на сайте "Ноутбуки". Придумай для этой категории текст для вставки в тег meta description';
+	'напиши пожалуйста для раздела "Антенны" тэги которые будут хорошо ранжироваться (META TITLE, META KEYWORDS, META DESCRIPTION), без геопривязки, без емодзи. Просто приведи по одному примеру текста, разделяя двоеточием, не добавляй слово "пример"';
 
-console.log('\nQuestion:');
-console.log('--------------------------------------');
-console.log(CONTENT);
-console.log('--------------------------------------');
-console.log('');
+const gpt = new GPT();
 
-const httpsAgent = new Agent({ rejectUnauthorized: false });
+const start = async () => {
+	console.clear();
+	console.log('--------------- [START] ---------------');
+	console.log('\nQuestion:');
+	console.log('---------------------------------------');
+	console.log(CONTENT);
+	console.log('---------------------------------------');
+	console.log('');
 
-const client = new GigaChat({
-	timeout: 600,
-	model: 'GigaChat',
-	credentials: AUTH_TOKEN,
-	httpsAgent,
-});
-
-client
-	.chat({
-		messages: [
-			{
-				role: 'user',
-				content: CONTENT,
-			},
-		],
-	})
-	.then((resp) => {
+	gpt.send(CONTENT).then((res) => {
 		console.log('\nAnswer:');
-		console.log('--------------------------------------');
-		console.log(resp.choices[0]?.message.content);
-		console.log('--------------------------------------');
+		console.log('---------------------------------------');
+		console.log(res);
+		console.log('---------------------------------------');
 		console.log('');
+		console.log('---------------- [END] ----------------');
 	});
+};
+
+start();
+
+// const file = readFile();
+
+// console.log(file[0][0]);
