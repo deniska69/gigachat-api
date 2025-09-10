@@ -31,4 +31,6 @@ export default class GPT {
 			})
 			.then((resp) => Promise.resolve(resp.choices[0]?.message.content));
 	};
+
+	balance = async () => await this.client.balance();
 }

@@ -10,15 +10,14 @@
   },
   "dependencies": {
     "@parabit/prettier": "^0.0.5",
+    "chardet": "^2.1.0",
     "dotenv": "^17.2.2",
     "gigachat": "^0.0.16",
+    "lowdb": "^7.0.1",
     "prettier": "^3.6.2",
-    "typescript": "^5.9.2",
-    "udsv": "^0.7.3"
+    "typescript": "^5.9.2"
   },
   "devDependencies": {
-    "@types/body-parser": "^1.19.6",
-    "@types/express": "^5.0.3",
     "@types/node": "^24.3.1"
   }
 }

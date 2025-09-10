@@ -1,10 +1,9 @@
 import * as fs from 'fs';
-import { inferSchema, initParser } from 'udsv';
+import chardet from 'chardet';
 
-export const readFile = (): string[][] => {
+export const readFile = () => {
 	const file = fs.readFileSync('file.csv');
-	const decodedString = new TextDecoder('windows-1251').decode(file);
-	const parser = initParser(inferSchema(decodedString));
-	const parsedFile = parser.typedArrs(decodedString);
-	return parsedFile;
+	const encoding = chardet.detect(file) || 'UTF-8';
+	const decodedString = new TextDecoder(encoding).decode(file);
+	return decodedString.split('\r\n');
 };
