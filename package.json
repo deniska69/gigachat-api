@@ -7,19 +7,19 @@
 	"type": "module",
 	"scripts": {
 		"gpt": "npx tsc && node dist/index_gpt.js",
+		"csv": "npx tsc && node dist/index_csv.js",
 		"file": "npx tsc && node dist/index_file.js",
 		"remains": "npx tsc && node dist/index_remains.js"
 	},
 	"dependencies": {
 		"@parabit/prettier": "^0.0.5",
+		"@types/node": "^24.3.1",
 		"chardet": "^2.1.0",
 		"dotenv": "^17.2.2",
 		"gigachat": "^0.0.16",
+		"iconv-lite": "^0.7.0",
 		"lowdb": "^7.0.1",
 		"prettier": "^3.6.2",
 		"typescript": "^5.9.2"
-	},
-	"devDependencies": {
-		"@types/node": "^24.3.1"
 	}
 }

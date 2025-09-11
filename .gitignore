@@ -6,3 +6,4 @@ dist
 *.numbers
 db.json
 *.txt
+*.DS_Store
