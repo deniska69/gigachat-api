@@ -14,7 +14,7 @@ const logging = async (text: string) => await writeLogs(text, 'log_file.txt');
 const readAndWriteFileToDB = async () => {
 	await logging('\n[СТАРТ] Чтения файла и запись в БД');
 
-	const arr = readFile();
+	const arr = readFile('file_2.csv');
 
 	let counter = 0;
 

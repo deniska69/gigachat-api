@@ -3,8 +3,8 @@ import chardet from 'chardet';
 import DB from './db.js';
 import GPT from './gpt.js';
 
-export const readFile = () => {
-	const file = fs.readFileSync('file.csv');
+export const readFile = (fileName: string) => {
+	const file = fs.readFileSync(fileName);
 	const encoding = chardet.detect(file) || 'UTF-8';
 	const decodedString = new TextDecoder(encoding).decode(file);
 	return decodedString.split('\r\n');
@@ -70,6 +70,8 @@ export const logBalance = async (gpt: GPT, file = 'log.txt') => {
 	await writeLogs('\n[СТАРТ] Подсчёт оставшихся токенов', file);
 
 	await gpt.balance().then(async ({ balance }) => {
+		console.log('Баланс токенов:');
+		console.log(balance);
 		await writeLogs(JSON.stringify(balance), file);
 	});
 };
