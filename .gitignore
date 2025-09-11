@@ -5,3 +5,4 @@ dist
 *.xlsx
 *.numbers
 db.json
+*.txt

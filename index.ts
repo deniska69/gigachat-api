@@ -1,39 +1,110 @@
 import GPT from './gpt.js';
-import { readFile } from './helpers.js';
 import DB from './db.js';
+import { flushLogs, getPromt, parseMessage, readFile } from './helpers.js';
 
-const CONTENT =
-	'напиши пожалуйста для раздела "Антенны" тэги которые будут хорошо ранжироваться (META TITLE, META KEYWORDS, META DESCRIPTION), без геопривязки, без емодзи. Просто приведи по одному примеру текста, разделяя двоеточием, не добавляй слово "пример"';
+console.clear();
 
 const gpt = new GPT();
 const db = new DB();
 
-console.clear();
+await db.init();
 
-const start = async () => {
-	console.log('--------------- [START] ---------------');
-	console.log('\nQuestion:');
-	console.log('---------------------------------------');
-	console.log(CONTENT);
-	console.log('---------------------------------------');
-	console.log('');
+process.on('SIGINT', async () => {
+	await flushLogs('Скрипт завершён вручную.');
+	await countRemaining();
+	process.exit(0);
+});
 
-	// gpt.send(CONTENT).then((res) => {
-	// 	console.log('\nAnswer:');
-	// 	console.log('---------------------------------------');
-	// 	console.log(res);
-	// 	console.log('---------------------------------------');
-	// 	console.log('');
-	// 	console.log('---------------- [END] ----------------');
-	// });
+process.on('uncaughtException', async (err) => {
+	await flushLogs('Необработанная ошибка.');
+	await countRemaining();
+	process.exit(1);
+});
 
-	gpt.balance().then((res) => console.log(res));
+const readAndWriteFileToDB = async () => {
+	const arr = readFile();
+
+	let counter = 0;
+
+	for (const item of arr) {
+		counter++;
+
+		await db
+			.add(item)
+			.then(() => console.log(counter, '/', arr.length, '|', item, `✅`))
+			.catch((e) => {
+				console.log(counter, '/', arr.length, '|', item, `❌`);
+				console.log(e);
+				return;
+			});
+	}
 };
 
-// start();
+const gptProcessing = async () => {
+	await flushLogs('\n[СТАРТ] Генерация мета тегов');
+	await db.read();
 
-// const file = readFile();
+	const items = db.db?.data.items;
+	if (!items) return console.error('[Error] items:', undefined);
 
-await db.init();
-await db.add('АТС (Автоматическая телефонная станция)');
-await db.update('АТС (Автоматическая телефонная станция)', { title: 'test' });
+	let counter = 0;
+
+	for (const item of items) {
+		counter++;
+
+		if (item.title && item.keywords && item.description) {
+			const logMissed = `${counter}/${items.length} | ${item.name} - Пропущено 🟡`;
+			console.log(logMissed);
+			// await flushLogs(logMissed);
+			continue;
+		}
+
+		try {
+			await gpt.send(getPromt(item.name)).then(async (message) => {
+				const meta = parseMessage(message);
+
+				if (meta.title && meta.keywords && meta.description) {
+					db.update(item.name, meta);
+
+					const logMessage = `${counter}/${items.length} | ${item.name} - Успешно ✅`;
+					console.log(logMessage);
+					await flushLogs(`${logMessage}`);
+				} else {
+					const logMessage = `${counter}/${items.length} | ${item.name} - Ошибка парсинга ответа gpt ❌`;
+					console.log(logMessage);
+					console.log({ message });
+					await flushLogs(logMessage);
+					await flushLogs(JSON.stringify(message));
+				}
+			});
+		} catch (error) {
+			const logMessage = `${counter}/${items.length} | ${item.name} - Ошибка выполнения запроса ❌`;
+			console.log(logMessage);
+			await flushLogs(logMessage);
+		}
+	}
+
+	await countRemaining();
+};
+
+const countRemaining = async () => {
+	await flushLogs('\n[СТАРТ] Подсчёт оставшихся');
+	await db.read();
+
+	const items = db.db?.data.items;
+	if (!items) return console.error('[Error] items:', undefined);
+
+	let counter = 0;
+
+	for (const item of items) {
+		if (!item.title || !item.description || !item.keywords) counter++;
+	}
+
+	const logMessage = `Количество не выполненных: ${counter}/${items.length}`;
+	console.log(logMessage);
+	await flushLogs(`${logMessage}`);
+};
+
+// await readAndWriteFileToDB();
+// await countRemaining();
+await gptProcessing();

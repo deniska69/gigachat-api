@@ -6,14 +6,14 @@ dotenv.config();
 
 export default class GPT {
 	private httpsAgent: InstanceType<typeof Agent> = new Agent();
-	private client: InstanceType<typeof GigaChat> = new GigaChat({});
+	client: InstanceType<typeof GigaChat> = new GigaChat({});
 
 	constructor() {
 		this.httpsAgent = new Agent({ rejectUnauthorized: false });
 
 		this.client = new GigaChat({
 			timeout: 600,
-			model: 'GigaChat',
+			model: 'GigaChat-2-Pro', // GigaChat-2, GigaChat-2-Pro, GigaChat-2-Max
 			credentials: process.env.GIGA_AUTH_KEY,
 			httpsAgent: this.httpsAgent,
 		});

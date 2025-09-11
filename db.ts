@@ -2,7 +2,7 @@ import { Low } from 'lowdb';
 import { JSONFile, JSONFilePreset } from 'lowdb/node';
 import * as fs from 'fs';
 
-const FILE_DB_NAME = 'db.json';
+const DB_FILENAME = 'db.json';
 
 type TypeItem = {
 	name: string;
@@ -14,17 +14,17 @@ type TypeItem = {
 type TypeData = { items: TypeItem[] };
 
 export default class DB {
-	private db?: Low<TypeData>;
+	db?: Low<TypeData>;
 
 	constructor() {}
 
 	init = async () => {
-		if (!fs.existsSync(FILE_DB_NAME)) {
-			const db = await JSONFilePreset<TypeData>(FILE_DB_NAME, { items: [] });
+		if (!fs.existsSync(DB_FILENAME)) {
+			const db = await JSONFilePreset<TypeData>(DB_FILENAME, { items: [] });
 			const item = { id: 0, name: 'test', title: 'test', keywords: 'test', description: 'test' };
 			await db.update(({ items }) => items.push(item));
 		} else {
-			const adapter = new JSONFile<TypeData>(FILE_DB_NAME);
+			const adapter = new JSONFile<TypeData>(DB_FILENAME);
 			this.db = new Low(adapter, { items: [] });
 		}
 	};
@@ -45,7 +45,7 @@ export default class DB {
 
 		this.db?.data.items.push({ name, ...props });
 
-		await this.write();
+		return await this.write();
 	};
 
 	update = async (
@@ -58,7 +58,14 @@ export default class DB {
 
 		if (item) {
 			Object.assign(item, props);
-			await this.write();
+			return await this.write();
 		}
+
+		return Promise.reject();
+	};
+
+	getTotal = async () => {
+		await this.read();
+		console.log({ total: this.db?.data.items.length });
 	};
 }
